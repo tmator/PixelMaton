@@ -3,6 +3,8 @@
  */
  
 import processing.video.*;
+import java.util.Date;
+import java.io.InputStreamReader;
 
 int cellSize = 8;
 
@@ -36,7 +38,21 @@ void setup() {
   colorMode(RGB, 255, 255, 255, 100);
   rectMode(CENTER);
 
-  video = new Capture(this, width, height);
+  String[] cameras = Capture.list();
+  
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      print(i);
+      print(" ");
+      println(cameras[i]);
+    }
+  }
+
+  video = new Capture(this, width, height,cameras[80]);
   video.start();  
   background(0);
 }
@@ -136,6 +152,28 @@ void keyPressed() {
     case 'r': effect=4; break;    
     case 't': effect=5; break;
     case 'y': effect=6; break;      
+    
+    case ' ':
+  {
+    //on save et on imprime
+        String fileName = new Date().getTime() +".png";
+    saveFrame("c:\\BMP\\"+fileName);
+    saveFrame("c:\\BMP\\img.png");
+    try {
+      String[] command = new String[1];
+      command[0]="c:\\print.bat";
+    Process p = exec(command); 
+    BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    String line = null;
+    while ((line = in.readLine()) != null) {
+      System.out.println(line);
+    }//fin while
+  } // fin try
+  catch (IOException e) { // gestion exception
+    e.printStackTrace();
+  } // fin catch
+  break;
+  }
 
   }
 }
